@@ -1,6 +1,7 @@
 'use client'
 
 import { createClient } from '@/lib/supabase/client'
+import { isSupabaseConfigured } from '@/lib/supabase/config'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -64,9 +65,17 @@ export default function Page() {
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+  const isConfigured = isSupabaseConfigured()
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!isConfigured) {
+      setError(
+        'Authentication is not configured yet. Copy .env.example to .env.local and add your Supabase URL and anon key.',
+      )
+      return
+    }
+
     const supabase = createClient()
     setIsLoading(true)
     setError(null)
@@ -150,7 +159,16 @@ export default function Page() {
                     />
                   </div>
                   {error && <p className="text-sm text-red-500">{error}</p>}
-                  <Button type="submit" className="w-full" disabled={isLoading}>
+                  {!isConfigured && (
+                    <p className="text-xs text-muted-foreground">
+                      Add your Supabase credentials in the local environment first.
+                    </p>
+                  )}
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={isLoading || !isConfigured}
+                  >
                     {isLoading ? 'Creating an account...' : 'Sign up'}
                   </Button>
                 </div>

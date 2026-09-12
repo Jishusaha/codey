@@ -90,9 +90,10 @@ export async function POST(req: Request) {
       ),
     });
 
+    const googleModel = process.env.GOOGLE_MODEL || "gemini-3.6-flash";
     const model =
       provider === "google"
-        ? google("gemini-2.0-flash")
+        ? google(googleModel)
         : openai("gpt-4o");
 
     const result = await generateObject({

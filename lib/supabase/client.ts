@@ -2,7 +2,7 @@ import { createBrowserClient } from '@supabase/ssr'
 
 function getMissingSupabaseConfigError() {
   return new Error(
-    'Supabase is not configured. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to enable auth.',
+    'Supabase is not configured. Copy .env.example to .env.local and add your project URL and anon key to enable auth.',
   )
 }
 
