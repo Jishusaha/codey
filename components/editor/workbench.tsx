@@ -4,24 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import * as Babel from "@babel/standalone";
 import Editor from "@monaco-editor/react";
-import {
-  Sparkles,
-  Rocket,
-  Save,
-  FilePlus2,
-  Trash2,
-  Eye,
-  Code2,
-  Loader2,
-  ExternalLink,
-  CheckCircle2,
-  CircleAlert,
-  CloudUpload,
-  Smartphone,
-  Monitor,
-  RefreshCw,
-  X,
-} from "lucide-react";
+import { Sparkles, Rocket, Save, FilePlus as FilePlus2, Trash2, Eye, Code as Code2, Loader as Loader2, ExternalLink, CircleCheck as CheckCircle2, CircleAlert, CloudUpload, Smartphone, Monitor, RefreshCw, X } from "lucide-react";
 import { toast } from "sonner";
 
 /* ---------- Types ---------- */
@@ -247,16 +230,16 @@ export function Workbench({ projectId, projectName, initialFiles }: WorkbenchPro
   const [unsavedChanges, setUnsavedChanges] = useState(false);
 
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const handleSaveRef = useRef<(auto?: boolean) => Promise<boolean>>(async () => false);
 
   // Auto-save debounce
   const scheduleAutoSave = useCallback(() => {
     setUnsavedChanges(true);
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(() => {
-      handleSave(true);
+      handleSaveRef.current(true);
     }, 3000);
-  }, // eslint-disable-next-line react-hooks/exhaustive-deps
-  []);
+  }, []);
 
   const handleEditorChange = (value: string | undefined) => {
     if (value === undefined || !activeFile) return;
@@ -351,6 +334,7 @@ export function Workbench({ projectId, projectName, initialFiles }: WorkbenchPro
       setIsSaving(false);
     }
   };
+  handleSaveRef.current = handleSave;
 
   const handleDeploy = async () => {
     setIsDeploying(true);

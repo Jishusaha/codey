@@ -90,7 +90,7 @@ export async function POST(req: Request) {
       ),
     });
 
-    const googleModel = process.env.GOOGLE_MODEL || "gemini-3.6-flash";
+    const googleModel = process.env.GOOGLE_MODEL || "gemini-2.0-flash";
     const model =
       provider === "google"
         ? google(googleModel)

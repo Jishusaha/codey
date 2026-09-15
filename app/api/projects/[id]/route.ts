@@ -20,7 +20,7 @@ export async function GET(
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   try {
-    const { data, error } = await supabase.from('projects').select('*').eq('id', id).single()
+    const { data, error } = await supabase.from('projects').select('*').eq('id', id).eq('user_id', user.id).single()
 
     if (error) {
       if (isMissingProjectsTableError(error)) {
@@ -65,7 +65,7 @@ export async function PATCH(
   if (typeof body.deployment_id === 'string') update.deployment_id = body.deployment_id
 
   try {
-    const { error } = await supabase.from('projects').update(update).eq('id', id)
+    const { error } = await supabase.from('projects').update(update).eq('id', id).eq('user_id', user.id)
 
     if (error) {
       if (isMissingProjectsTableError(error)) {
@@ -99,7 +99,7 @@ export async function DELETE(
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   try {
-    const { error } = await supabase.from('projects').delete().eq('id', id)
+    const { error } = await supabase.from('projects').delete().eq('id', id).eq('user_id', user.id)
 
     if (error) {
       if (isMissingProjectsTableError(error)) {

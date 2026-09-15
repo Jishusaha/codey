@@ -75,18 +75,28 @@ export async function POST(req: Request) {
       throw new Error(deploymentData.error?.message || "Failed to deploy");
     }
 
-    const url = `https://${deploymentData.url}`;
+    const url = deploymentData.url ? `https://${deploymentData.url}` : null;
+    if (!url) {
+      throw new Error("Deployment succeeded but no URL was returned.");
+    }
 
     if (typeof projectId === "string") {
-      await fetch(new URL(`/api/projects/${projectId}`, req.url), {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json", cookie: req.headers.get("cookie") || "" },
-        body: JSON.stringify({
-          deploy_url: url,
-          deploy_status: "ready",
-          deployment_id: deploymentData.id,
-        }),
-      });
+      const protocol = req.headers.get("x-forwarded-proto") || "https";
+      const host = req.headers.get("host") || "localhost:3000";
+      const origin = `${protocol}://${host}`;
+      try {
+        await fetch(new URL(`/api/projects/${projectId}`, origin), {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json", cookie: req.headers.get("cookie") || "" },
+          body: JSON.stringify({
+            deploy_url: url,
+            deploy_status: "ready",
+            deployment_id: deploymentData.id,
+          }),
+        });
+      } catch {
+        // Non-fatal: the deployment is live even if we can't update the project record.
+      }
     }
 
     return NextResponse.json({
